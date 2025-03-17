@@ -56,6 +56,21 @@ services:
     volumes:
       - n8n-data:/home/node/.n8n
 
+  open-webui:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - ${OPEN_WEBUI_PORT-3000}:8080
+    environment:
+      - 'OLLAMA_BASE_URL=http://host.docker.internal:11434'
+      - 'WEBUI_SECRET_KEY='
+    restart: unless-stopped
+
+
   windmill_server:
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -152,6 +167,7 @@ volumes:
   postgres: null
   langflow-data: null
   n8n-data: null
+  open-webui: null
   worker_dependency_cache: null
   worker_logs: null
   windmill_index: null
