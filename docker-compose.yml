@@ -1,4 +1,33 @@
 services:
+# TODO: https://github.com/u14app/deep-research
+  surrealdb:
+    image: surrealdb/surrealdb:v2
+    ports:
+      - "8000:8000"
+    volumes:
+      - surreal_data:/mydata
+    command: start --user root --pass root rocksdb:/mydata/mydatabase.db
+    pull_policy: always
+    user: root
+
+  open_notebook:
+    image: lfnovo/open_notebook:latest
+    ports:
+      - "8080:8502"
+    environment:
+        - OPENAI_API_KEY=API_KEY
+        - SURREAL_ADDRESS=surrealdb
+        - SURREAL_PORT=8000
+        - SURREAL_USER=root
+        - SURREAL_PASS=root
+        - SURREAL_NAMESPACE=open_notebook
+        - SURREAL_DATABASE=open_notebook
+    depends_on:
+      - surrealdb
+    pull_policy: always
+    volumes:
+      - notebook_data:/app/data
+
   postgres:
     image: pgvector/pgvector:pg17
     restart: always
@@ -173,3 +202,5 @@ volumes:
   windmill_index: null
   lsp_cache: null
   caddy_data: null
+  surreal_data: null
+  notebook_data: null
